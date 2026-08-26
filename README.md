@@ -81,7 +81,6 @@ Các câu lệnh được sử dụng trong quá trình huấn luyện gồm:
 * `tat_vang`
 * `bat_xanh`
 * `tat_xanh`
-* `noise`
 * `unknown`
 
 Tần số lấy mẫu âm thanh:
