@@ -172,7 +172,7 @@ Hệ thống có thể:
 
 Video mô phỏng hoạt động của hệ thống:
 
-**[Xem video demo](ĐIỀN_LINK_VIDEO_YOUTUBE_HOẶC_GOOGLE_DRIVE)**
+**[Xem video demo]([ĐIỀN_LINK_VIDEO_YOUTUBE_HOẶC_GOOGLE_DRIVE](https://drive.google.com/drive/folders/147ZECOaw1E5bTha61UP4HWUCfSfvb0IQ?usp=drive_link))**
 
 ---
 
