@@ -172,7 +172,7 @@ Hệ thống có thể:
 
 Video mô phỏng hoạt động của hệ thống:
 
-**[Xem video demo]([https://drive.google.com/drive/folders/147ZECOaw1E5bTha61UP4HWUCfSfvb0IQ?usp=drive_link])**
+**[Xem video demo](https://drive.google.com/file/d/1GDWyiwA9YflLM_Tne0BsfbyH1EgVbAPD/view?usp=sharing)**
 
 ---
 
