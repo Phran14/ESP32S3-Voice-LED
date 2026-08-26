@@ -154,17 +154,26 @@ Mã nguồn của hệ thống được lưu trong thư mục:
 Các chương trình kiểm tra phần cứng cũng được lưu riêng để thuận tiện cho việc kiểm thử.
 
 ---
-
 ## 10. Kết quả
 
 Hệ thống có thể:
 
-* Thu nhận âm thanh từ INMP441.
-* Nhận diện các câu lệnh đã được huấn luyện.
-* Điều khiển LED tương ứng.
-* Hoạt động trực tiếp trên ESP32-S3.
+- Thu nhận âm thanh từ INMP441.
+- Nhận diện các câu lệnh đã được huấn luyện.
+- Điều khiển LED tương ứng.
+- Hoạt động trực tiếp trên ESP32-S3.
 
-![Demo hệ thống](images/demo.jpg)
+### 10.1 Mô hình thực tế
+
+![Mô hình thực tế](images/system.jpg)
+
+### 10.2 Kết quả điều khiển LED
+
+![LED đỏ hoạt động](images/led_do.jpg)
+
+![LED vàng hoạt động](images/led_vang.jpg)
+
+![LED xanh hoạt động](images/led_xanh.jpg)
 
 ---
 
