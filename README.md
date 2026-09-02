@@ -107,6 +107,9 @@ Tần số lấy mẫu âm thanh được thiết lập ở mức **16 kHz**, ph
 Các mẫu âm thanh sau khi thu thập được đưa lên nền tảng **Edge Impulse** để thực hiện quá trình tiền xử lý, trích xuất đặc trưng và huấn luyện mô hình Machine Learning.
 
 Việc bổ sung lớp `unknown` giúp mô hình có khả năng phân biệt các câu lệnh hợp lệ với những âm thanh hoặc câu nói không thuộc các lớp điều khiển, từ đó hạn chế việc hệ thống thực hiện lệnh ngoài ý muốn.
+
+---
+
 ## 7. Huấn luyện mô hình bằng Edge Impulse
 
 Quy trình huấn luyện:
