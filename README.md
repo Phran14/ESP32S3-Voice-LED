@@ -128,6 +128,7 @@ Quy trình huấn luyện:
 <p align="center">
   <img src="images/edge_impulse.png" width="600">
 </p>
+
 ---
 
 ## 8. Nguyên lý hoạt động
