@@ -187,7 +187,9 @@ Hệ thống có thể:
 
 ### 10.1 Mô hình thực tế
 
-![Mô hình thực tế](images/system.jpg)
+<p align="center">
+  <img src="images/system.jpg" width="600">
+</p>
 
 ### 10.2 Kết quả điều khiển LED
 
