@@ -45,8 +45,10 @@ Sau khi nhận diện câu lệnh, ESP32-S3 thực hiện thao tác tương ứn
 
 ## 4. Sơ đồ hệ thống
 
-![Sơ đồ kết nối](images/wiring.png)
 
+<p align="center">
+  <img src="images/wiring.png" width="600">
+</p>
 Hệ thống gồm ba khối chính:
 
 **Microphone INMP441 → ESP32-S3 → Mô hình AI → LED**
