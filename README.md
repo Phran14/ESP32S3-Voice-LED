@@ -73,24 +73,38 @@ INMP441 được kết nối với ESP32-S3 thông qua giao tiếp I2S.
 
 ## 6. Bộ dữ liệu
 
-Các câu lệnh được sử dụng trong quá trình huấn luyện gồm:
+Để xây dựng mô hình nhận dạng giọng nói, bộ dữ liệu được thu thập với các câu lệnh điều khiển tương ứng với ba LED đỏ, vàng và xanh. Các câu lệnh được sử dụng trong quá trình huấn luyện gồm:
 
-* `bat_do`        90 mẫu
-* `tat_do`
-* `bat_vang`
-* `tat_vang`
-* `bat_xanh`
-* `tat_xanh`
-* `unknown`
+* `bat_do` – bật LED đỏ
+* `tat_do` – tắt LED đỏ
+* `bat_vang` – bật LED vàng
+* `tat_vang` – tắt LED vàng
+* `bat_xanh` – bật LED xanh
+* `tat_xanh` – tắt LED xanh
+* `unknown` – các âm thanh hoặc câu lệnh không thuộc các lớp điều khiển trên
 
-Tần số lấy mẫu âm thanh:
+Mỗi lớp lệnh điều khiển được thu thập **90 mẫu dữ liệu**, trong khi lớp `unknown` được thu thập **120 mẫu**. Như vậy, tổng số mẫu dữ liệu được sử dụng là:
 
-**16 kHz**
+**6 × 90 + 120 = 660 mẫu**
 
-Các file âm thanh được thu và đưa lên Edge Impulse để tiến hành tiền xử lý và huấn luyện mô hình.
+Chi tiết số lượng dữ liệu của từng lớp được thể hiện trong bảng dưới đây:
 
----
+| STT | Nhãn | Ý nghĩa | Số lượng mẫu |
+|---:|---|---|---:|
+| 1 | `bat_do` | Bật LED đỏ | 90 |
+| 2 | `tat_do` | Tắt LED đỏ | 90 |
+| 3 | `bat_vang` | Bật LED vàng | 90 |
+| 4 | `tat_vang` | Tắt LED vàng | 90 |
+| 5 | `bat_xanh` | Bật LED xanh | 90 |
+| 6 | `tat_xanh` | Tắt LED xanh | 90 |
+| 7 | `unknown` | Âm thanh không thuộc các câu lệnh đã định nghĩa | 120 |
+| | **Tổng cộng** | | **660** |
 
+Tần số lấy mẫu âm thanh được thiết lập ở mức **16 kHz**, phù hợp với bài toán nhận dạng giọng nói trên vi điều khiển.
+
+Các mẫu âm thanh sau khi thu thập được đưa lên nền tảng **Edge Impulse** để thực hiện quá trình tiền xử lý, trích xuất đặc trưng và huấn luyện mô hình Machine Learning.
+
+Việc bổ sung lớp `unknown` giúp mô hình có khả năng phân biệt các câu lệnh hợp lệ với những âm thanh hoặc câu nói không thuộc các lớp điều khiển, từ đó hạn chế việc hệ thống thực hiện lệnh ngoài ý muốn.
 ## 7. Huấn luyện mô hình bằng Edge Impulse
 
 Quy trình huấn luyện:
