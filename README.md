@@ -75,7 +75,7 @@ INMP441 được kết nối với ESP32-S3 thông qua giao tiếp I2S.
 
 Các câu lệnh được sử dụng trong quá trình huấn luyện gồm:
 
-* `bat_do`
+* `bat_do`        90 mẫu
 * `tat_do`
 * `bat_vang`
 * `tat_vang`
