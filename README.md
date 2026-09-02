@@ -119,8 +119,10 @@ Quy trình huấn luyện:
 8. Đánh giá độ chính xác.
 9. Export mô hình cho ESP32-S3.
 
-![Edge Impulse](images/edge_impulse.png)
 
+<p align="center">
+  <img src="images/edge_impulse.png" width="600">
+</p>
 ---
 
 ## 8. Nguyên lý hoạt động
