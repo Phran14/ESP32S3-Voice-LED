@@ -193,12 +193,23 @@ Hệ thống có thể:
 
 ### 10.2 Kết quả điều khiển LED
 
-![LED đỏ hoạt động](images/led_do.jpg)
+![LED đỏ hoạt động]
 
-![LED vàng hoạt động](images/led_vang.jpg)
+<p align="center">
+  <img src="images/led_do.png" width="600">
+</p>
 
-![LED xanh hoạt động](images/led_xanh.jpg)
+![LED vàng hoạt động]
 
+<p align="center">
+  <img src="images/led_vang.png" width="600">
+</p>
+
+![LED xanh hoạt động]
+
+<p align="center">
+  <img src="images/led_xanh.png" width="600">
+</p>
 ---
 
 ## 11. Video demo
