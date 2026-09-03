@@ -219,6 +219,25 @@ Xây dựng script Python (`fft_analysis.py`, dùng thư viện `numpy`, `scipy`
 3. Tính FFT (áp dụng cửa sổ Hamming để giảm hiện tượng rò rỉ phổ - *spectral leakage*) và vẽ phổ biên độ theo tần số (0 – 8000 Hz).
 4. Tính và vẽ spectrogram bằng phép biến đổi Fourier thời gian ngắn (Short-Time Fourier Transform - STFT).
 
+### Nguyên lí biến đổi của công cụ
+
+Công cụ sử dụng thuật toán **Biến đổi Fourier nhanh (Fast Fourier Transform – FFT)**, cụ thể là thuật toán **Cooley–Tukey** (được cài đặt sẵn trong hàm `numpy.fft.rfft`), để tính **Biến đổi Fourier rời rạc (DFT)** của tín hiệu:
+
+$$X_k = \sum_{n=0}^{N-1} x_n \cdot e^{-i2\pi kn/N}$$
+
+Trong đó `x_n` là N mẫu tín hiệu trong miền thời gian, `X_k` là thành phần phổ phức tại tần số thứ k.
+
+Tính DFT trực tiếp theo công thức trên có độ phức tạp **O(N²)**, nhưng FFT áp dụng chiến lược chia để trị (đệ quy chia đôi bài toán) giúp giảm độ phức tạp xuống còn **O(N log N)** — với N = 32000 mẫu (2 giây, 16 kHz), việc tính toán gần như tức thời.
+
+**Các bước xử lý trong công cụ phân tích:**
+
+1. **Cửa sổ hoá (windowing):** nhân tín hiệu với cửa sổ Hamming để giảm hiện tượng rò rỉ phổ (*spectral leakage*) do đoạn tín hiệu ghi được không tuần hoàn tự nhiên.
+2. **Áp dụng FFT:** dùng `rfft` — biến thể tối ưu cho tín hiệu thực (real-valued), chỉ tính nửa phổ dương nhờ tính đối xứng của phổ tín hiệu thực.
+3. **Tính biên độ phổ:** lấy trị tuyệt đối của số phức `X_k`, quy đổi sang thang decibel: `20·log10(|X_k|)`.
+4. **Ánh xạ trục tần số:** mỗi chỉ số `k` tương ứng với tần số thực `f_k = k · (f_s / N)` (Hz), với `f_s` là tần số lấy mẫu (16000 Hz).
+
+**Đối với spectrogram:** công cụ áp dụng **Biến đổi Fourier thời gian ngắn (Short-Time Fourier Transform – STFT)** bằng hàm `scipy.signal.spectrogram` — chia tín hiệu thành nhiều đoạn nhỏ chồng lấp nhau (cửa sổ Hann, kích thước 512 mẫu, chồng lấp 384 mẫu), tính FFT riêng cho từng đoạn, từ đó thể hiện phổ tần số biến thiên theo thời gian.
+
 ### Kết quả minh hoạ
 
 Ảnh dựa trên mẫu bat_xanh_001 của dataset
