@@ -224,7 +224,7 @@ Xây dựng script Python (`fft_analysis.py`, dùng thư viện `numpy`, `scipy`
 Ảnh dựa trên mẫu bat_xanh_001 của dataset
 
 <p align="center">
-  <img src="images/system.jpg" width="600">
+  <img src="images/phan_tich_tin_hieu.png" width="600">
 </p>
 
 **Nhận xét mẫu (điền lại theo kết quả thực tế của nhóm sau khi chạy):**
