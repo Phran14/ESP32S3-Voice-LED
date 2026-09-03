@@ -70,6 +70,7 @@ INMP441 được kết nối với ESP32-S3 thông qua giao tiếp I2S.
 | SCK     | GPIO 4   |
 | WS      | GPIO 5   |
 | SD      | GPIO 6   |
+| L/R     | GND      |
 
 ---
 
@@ -102,11 +103,35 @@ Chi tiết số lượng dữ liệu của từng lớp được thể hiện tr
 | 7 | `unknown` | Âm thanh không thuộc các câu lệnh đã định nghĩa | 120 |
 | | **Tổng cộng** | | **660** |
 
-Tần số lấy mẫu âm thanh được thiết lập ở mức **16 kHz**, phù hợp với bài toán nhận dạng giọng nói trên vi điều khiển.
-
 Các mẫu âm thanh sau khi thu thập được đưa lên nền tảng **Edge Impulse** để thực hiện quá trình tiền xử lý, trích xuất đặc trưng và huấn luyện mô hình Machine Learning.
 
 Việc bổ sung lớp `unknown` giúp mô hình có khả năng phân biệt các câu lệnh hợp lệ với những âm thanh hoặc câu nói không thuộc các lớp điều khiển, từ đó hạn chế việc hệ thống thực hiện lệnh ngoài ý muốn.
+
+### 6.1 Thông số kỹ thuật của tín hiệu âm thanh thu được
+
+Bảng dưới đây mô tả chi tiết các thông số kỹ thuật của quá trình thu âm bằng microphone INMP441 qua giao tiếp I2S trên ESP32-S3, được cấu hình trực tiếp trong mã nguồn firmware:
+
+| Thông số | Giá trị | Ghi chú |
+|---|---|---|
+| Tần số lấy mẫu (sample rate) | **16 kHz (16000 Hz)** | Phù hợp với băng thông giọng nói người và giới hạn tài nguyên vi điều khiển |
+| Độ phân giải tại tầng thu I2S | **32-bit/mẫu** | INMP441 xuất dữ liệu 24-bit, được căn trái (left-justified) trong khung 32-bit theo chuẩn I2S; ESP32-S3 đọc nguyên khung 32-bit này (`I2S_DATA_BIT_WIDTH_32BIT`) |
+| Độ phân giải dữ liệu sau xử lý | **16-bit PCM (int16, có dấu)** | Sau khi đọc khung 32-bit, firmware dịch phải (`>> 14`) và giới hạn (clamp) về khoảng [-32768, 32767] để tạo PCM 16-bit chuẩn — đây là định dạng lưu trong file WAV và đưa vào mô hình Edge Impulse |
+| Số kênh | **Mono (1 kênh)** | Chân L/R của INMP441 nối GND → chỉ xuất kênh trái; cấu hình `I2S_SLOT_MODE_MONO` |
+| Chuẩn giao tiếp I2S | **Philips I2S Standard** | Sử dụng chế độ `I2S_MODE_STD` của thư viện `ESP_I2S.h` — đây là chuẩn I2S nguyên bản (Philips I2S), dữ liệu truyền dạng MSB-first, bit dữ liệu đầu tiên lệch sau cạnh WS đúng 1 chu kỳ BCLK. Đây **không phải** chế độ Left-Justified (MSB không lệch pha) và cũng không phải chế độ PCM/DSP (dùng khung xung ngắn) |
+| Định dạng file lưu | **WAV PCM, 16-bit, mono, 16 kHz** | Tương thích trực tiếp với định dạng dữ liệu âm thanh mà Edge Impulse yêu cầu khi ingest dữ liệu huấn luyện |
+| Độ dài mỗi mẫu ghi âm | **2 giây** (32000 mẫu/lần ghi) | `SAMPLE_RATE × RECORD_SECONDS = 16000 × 2 = 32000` |
+
+**Sơ đồ luồng xử lý bit của một mẫu âm thanh:**
+
+```
+INMP441 (24-bit audio, căn trái trong khung 32-bit, chuẩn Philips I2S)
+        ↓  I2S.begin(I2S_MODE_STD, 16000 Hz, 32-bit, MONO)
+Khung dữ liệu I2S 32-bit (int32_t)
+        ↓  dịch phải 14 bit (>> MIC_SHIFT), giới hạn [-32768, 32767]
+PCM 16-bit (int16_t) — 16000 mẫu/giây
+        ↓
+File WAV (16-bit PCM, mono, 16kHz)  +  Đầu vào cho Edge Impulse (32000 mẫu / 2 giây)
+```
 
 ---
 
@@ -176,6 +201,40 @@ Mã nguồn của hệ thống được lưu trong thư mục:
 Các chương trình kiểm tra phần cứng cũng được lưu riêng để thuận tiện cho việc kiểm thử.
 
 ---
+
+## 9.1 Phân tích tín hiệu âm thanh: miền thời gian và miền tần số (FFT)
+
+Để đánh giá chất lượng tín hiệu thu được từ microphone INMP441 trước khi đưa vào huấn luyện mô hình, nhóm thực hiện phân tích một mẫu ghi âm thực tế (ví dụ: câu lệnh `bat_xanh`) trên cả hai miền:
+
+- **Miền thời gian (Time domain):** quan sát biên độ tín hiệu theo thời gian, giúp xác định xem tín hiệu có bị bão hoà (clipping), có khoảng lặng hợp lý trước/sau khi nói, và mức nhiễu nền hay không.
+- **Miền tần số (Frequency domain – FFT):** biến đổi Fourier nhanh (Fast Fourier Transform) chuyển tín hiệu từ miền thời gian sang miền tần số, cho biết năng lượng tín hiệu tập trung ở dải tần nào — với giọng nói người, năng lượng chủ yếu nằm trong khoảng 100 Hz – 4 kHz (formant F1, F2, F3), giải thích vì sao tần số lấy mẫu 16 kHz (tần số Nyquist = 8 kHz) là đủ để không mất thông tin theo định lý Nyquist–Shannon.
+- **Spectrogram (STFT):** kết hợp cả hai miền — cho thấy phổ tần số biến thiên như thế nào theo thời gian trong suốt câu lệnh, trực quan hoá rõ các âm tiết.
+
+### Công cụ phân tích
+
+Xây dựng script Python (`fft_analysis.py`, dùng thư viện `numpy`, `scipy`, `matplotlib`) để tự động:
+
+1. Đọc file WAV (PCM 16-bit, mono, 16 kHz) từ bộ dữ liệu đã thu.
+2. Vẽ đồ thị dạng sóng theo thời gian.
+3. Tính FFT (áp dụng cửa sổ Hamming để giảm hiện tượng rò rỉ phổ - *spectral leakage*) và vẽ phổ biên độ theo tần số (0 – 8000 Hz).
+4. Tính và vẽ spectrogram bằng phép biến đổi Fourier thời gian ngắn (Short-Time Fourier Transform - STFT).
+
+### Kết quả minh hoạ
+
+Ảnh dựa trên mẫu bat_xanh_001 của dataset
+
+<p align="center">
+  <img src="images/system.jpg" width="600">
+</p>
+
+**Nhận xét mẫu (điền lại theo kết quả thực tế của nhóm sau khi chạy):**
+
+- Tín hiệu miền thời gian cho thấy phần lặng ở đầu/cuối và phần năng lượng cao tương ứng với lúc phát âm câu lệnh, biên độ PCM nằm trong khoảng cho phép (không bị clipping ở ±32768).
+- Phổ FFT cho thấy năng lượng tập trung chủ yếu trong dải tần thấp (dưới ~3–4 kHz), phù hợp với đặc trưng phổ của giọng nói người.
+- Spectrogram thể hiện rõ ranh giới giữa khoảng lặng và các âm tiết trong câu lệnh, cũng như sự thay đổi tần số formant theo thời gian.
+
+---
+
 ## 10. Kết quả
 
 Hệ thống có thể:
@@ -193,23 +252,24 @@ Hệ thống có thể:
 
 ### 10.2 Kết quả điều khiển LED
 
-![LED đỏ hoạt động]
+[LED đỏ hoạt động]
 
 <p align="center">
   <img src="images/led_do.png" width="600">
 </p>
 
-![LED vàng hoạt động]
+[LED vàng hoạt động]
 
 <p align="center">
   <img src="images/led_vang.png" width="600">
 </p>
 
-![LED xanh hoạt động]
+[LED xanh hoạt động]
 
 <p align="center">
   <img src="images/led_xanh.png" width="600">
 </p>
+
 ---
 
 ## 11. Video demo
