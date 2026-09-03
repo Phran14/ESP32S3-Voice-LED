@@ -154,8 +154,9 @@ Quy trình huấn luyện:
   <img src="images/edge_impulse.png" width="600">
 </p>
 
+## Link huấn luyện mô hình
 
-**[Edge impulse](https://studio.edgeimpulse.com/public/1085030/live)**
+**[Edge Impulse](https://studio.edgeimpulse.com/public/1085030/live)**
 
 
 ---
