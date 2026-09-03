@@ -154,6 +154,10 @@ Quy trình huấn luyện:
   <img src="images/edge_impulse.png" width="600">
 </p>
 
+
+**[Edge impulse](https://studio.edgeimpulse.com/public/1085030/live)**
+
+
 ---
 
 ## 8. Nguyên lý hoạt động
